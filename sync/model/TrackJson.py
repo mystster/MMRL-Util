@@ -63,7 +63,8 @@ class TrackJson(AttrDict, JsonIO):
         return AttrDict(
             type=self.type.name,
             added=self.added,
-            source=self.source or None
+            source=self.source or None,
+            antifeatures=self.antifeatures or None
         )
 
     def write(self, file):
