@@ -1,5 +1,4 @@
 import json
-
 from zipfile import ZipFile
 from pathlib import Path
 
@@ -10,6 +9,7 @@ from .JsonIO import JsonIO
 
 from .ModuleNote import ModuleNote
 from .ModuleFeatures import ModuleFeatures
+from .ModuleManager import ModuleManager
 from .RootSolutions import RootSolutions
 
 class LocalModule(AttrDict):
@@ -45,11 +45,28 @@ class LocalModule(AttrDict):
     note: ModuleNote
     features: ModuleFeatures
     root: RootSolutions
+    manager: ModuleManager
+
+    @classmethod
+    def clean_json(cls, data):
+        if isinstance(data, dict):
+            cleaned_dict = {
+                key: cls.clean_json(value)
+                for key, value in data.items()
+                if value not in (None, [], {})
+            }
+            return {k: v for k, v in cleaned_dict.items() if v not in (None, [], {})}
+        elif isinstance(data, list):
+            cleaned_list = [cls.clean_json(item) for item in data]
+            return [item for item in cleaned_list if item not in (None, [], {})]
+        return data
 
     @classmethod
     def load(cls, file, track, config):
         cls._zipfile = ZipFile(file, "r")
         fields = cls.expected_fields()
+
+        cleaned_track = cls.clean_json(track)
 
         try:
             if ("#MAGISK" not in cls.file_read("META-INF/com/google/android/updater-script")):
@@ -61,7 +78,7 @@ class LocalModule(AttrDict):
             raise MagiskModuleError(msg)
 
         try:
-            props = cls.file_read( "module.prop")
+            props = cls.file_read("module.prop")
         except BaseException as err:
             raise MagiskModuleError(err.args)
 
@@ -80,15 +97,16 @@ class LocalModule(AttrDict):
 
         local_module = LocalModule()
         for key in fields.keys():
-            if config.allowedCategories and key == "categories" and track.get("categories"):
-                local_module[key] = JsonIO.filterArray(config.allowedCategories, track.get(key))
+            if config.allowedCategories and key == "categories" and cleaned_track.get("categories"):
+                local_module[key] = JsonIO.filterArray(config.allowedCategories, cleaned_track.get(key))
             else:
-                value = track.get(key) if track.get(key) is not None else obj.get(key)
+                value = cleaned_track.get(key) if cleaned_track.get(key) is not None else obj.get(key)
                 if value is not None and value is not False:  # Filter out None and False values
                     local_module[key] = value
 
         try:
             raw_json = json.loads(cls.file_read("common/repo.json"))
+            raw_json = cls.clean_json(raw_json)  # Clean the raw JSON data
 
             for item in raw_json.items():
                 key, value = item
@@ -117,7 +135,8 @@ class LocalModule(AttrDict):
             "sepolicy": cls.file_exist(f"sepolicy.rule"),
             
             "zygisk": cls.file_exist(f"zygisk/"),
-
+            "action": cls.file_exist(f"action.sh") or cls.file_exist(f"common/action.sh"),
+            
             # KernelSU
             "webroot": cls.file_exist(f"webroot/index.html"),
             "post_mount": cls.file_exist(f"post-mount.sh") or cls.file_exist(f"common/post-mount.sh"),
@@ -131,7 +150,7 @@ class LocalModule(AttrDict):
         
         local_module.features = {k: v for k, v in features.items() if v is not None and v is not False}
 
-        return local_module
+        return cls.clean_json(local_module)
    
     @classmethod
     def file_exist(cls, name: str): 
