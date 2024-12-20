@@ -1,4 +1,5 @@
 import json
+import yaml
 from zipfile import ZipFile
 from pathlib import Path
 
@@ -105,7 +106,11 @@ class LocalModule(AttrDict):
                     local_module[key] = value
 
         try:
-            raw_json = json.loads(cls.file_read("common/repo.json"))
+            has_yaml = cls.file_exist("common/repo.yaml")
+            if has_yaml:
+                raw_json = yaml.load(cls.file_read("common/repo.yaml"), Loader=yaml.FullLoader)
+            else:
+                raw_json = json.loads(cls.file_read("common/repo.json"))
             raw_json = cls.clean_json(raw_json)  # Clean the raw JSON data
 
             for item in raw_json.items():
