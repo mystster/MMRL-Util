@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Sequence, Type, Tuple
 from xml.dom import minidom
 from datetime import datetime
+from pathlib import Path
 
 from dateutil.parser import parse
 
@@ -172,7 +173,9 @@ class Main:
             track = TrackJson(json.load(fp=sys.stdin))
             module_folder = modules_folder.joinpath(track.id)
 
-            json_file = module_folder.joinpath(TrackJson.filename())
+            has_yaml_track = module_folder.joinpath("track.yaml").exists()
+            json_file = module_folder.joinpath(TrackJson.filename(has_yaml_track))
+            
             track.write(json_file)
 
         elif cls._args.keys:
@@ -181,7 +184,9 @@ class Main:
 
         elif cls._args.modify_module_id is not None:
             module_folder = modules_folder.joinpath(cls._args.modify_module_id)
-            json_file = module_folder.joinpath(TrackJson.filename())
+            
+            has_yaml_track = module_folder.joinpath("track.yaml").exists()
+            json_file = module_folder.joinpath(TrackJson.filename(has_yaml_track))
 
             if not json_file.exists():
                 print_error(f"There is no track for this id ({cls._args.modify_module_id})")

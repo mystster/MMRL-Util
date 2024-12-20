@@ -109,8 +109,15 @@ class TrackJson(AttrDict, JsonIO):
         return TrackJson(obj)
 
     @classmethod
-    def filename(cls):
-        return "track.json"
+    def filename(cls, yaml):
+        if yaml:
+            return "track.yaml"
+        else:
+            return "track.json"
+
+    @classmethod
+    def filenameYaml(cls):
+        return "track.yaml"
 
     @classmethod
     def expected_fields(cls, __type=True):

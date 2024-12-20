@@ -16,6 +16,7 @@ class ModuleManagerSolution(AttrDict):
 class ModuleManager(AttrDict):
     magisk: ModuleManagerSolution
     kernelsu: ModuleManagerSolution
+    ksunext: ModuleManagerSolution
     apatch: ModuleManagerSolution
     
     @classmethod

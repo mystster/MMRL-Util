@@ -141,7 +141,10 @@ class Check:
             if not self._check_folder(track, online_module.id):
                 self._log.i(f"ids: [{old_id}] -> track has been migrated to {track.id}")
                 module_folder = self._modules_folder.joinpath(track.id)
-                track_json_file = module_folder.joinpath(TrackJson.filename())
+                
+                has_yaml_track = module_folder.joinpath("track.yaml").exists()
+                track_json_file = module_folder.joinpath(TrackJson.filename(has_yaml_track))
+                
                 track.write(track_json_file)
 
             update_json_file = module_folder.joinpath(UpdateJson.filename())

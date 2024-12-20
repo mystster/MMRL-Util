@@ -54,12 +54,12 @@ class LocalModule(AttrDict):
             cleaned_dict = {
                 key: cls.clean_json(value)
                 for key, value in data.items()
-                if value not in (None, [], {})
+                if value not in (None, [], {}, "")
             }
-            return {k: v for k, v in cleaned_dict.items() if v not in (None, [], {})}
+            return {k: v for k, v in cleaned_dict.items() if v not in (None, [], {}, "")}
         elif isinstance(data, list):
             cleaned_list = [cls.clean_json(item) for item in data]
-            return [item for item in cleaned_list if item not in (None, [], {})]
+            return [item for item in cleaned_list if item not in (None, [], {}, "")]
         return data
 
     @classmethod
