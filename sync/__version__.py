@@ -1,9 +1,9 @@
 def get_version() -> str:
-    return "2.9.8"
+    return "2.10.8"
 
 
 def get_version_code() -> int:
-    return 289
+    return 290
 
 
 __all__ = [
