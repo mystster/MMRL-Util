@@ -113,6 +113,7 @@ options:
   "support": "https://github.com/Googlers-Repo/repo/issues",
   "donate": "https://github.com/sponsors/DerGoogler",
   "submission": null,
+  "description": null,
   "base_url": "https://gr.dergoogler.com/repo/",
   "max_num": 3,
   "enable_log": true,
@@ -120,17 +121,18 @@ options:
 }
 ```
 
-| Key        | Attribute | Description                                     |
-| ---------- | --------- | ----------------------------------------------- |
-| name       | required  | Name of your module repository                  |
-| base_url   | required  | Need to end with `/`                            |
-| website    | optional  | Name of your website                            |
-| donate     | optional  | Name of your donation url                       |
-| submission | optional  | Link to your submission requests                |
-| support    | optional  | Link to your support chat                       |
-| max_num    | optional  | Max num of versions for modules, default is `3` |
-| enable_log | optional  | default is `true`                               |
-| log_dir    | optional  | default is `null`                               |
+| Key         | Attribute | Description                                     |
+| ----------- | --------- | ----------------------------------------------- |
+| name        | required  | Name of your module repository                  |
+| base_url    | required  | Need to end with `/`                            |
+| website     | optional  | Name of your website                            |
+| donate      | optional  | Name of your donation url                       |
+| submission  | optional  | Link to your submission requests                |
+| description | optional  | Describe your repository                        |
+| support     | optional  | Link to your support chat                       |
+| max_num     | optional  | Max num of versions for modules, default is `3` |
+| enable_log  | optional  | default is `true`                               |
+| log_dir     | optional  | default is `null`                               |
 
 ## track.json
 

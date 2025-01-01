@@ -59,6 +59,8 @@ class Index:
                 support=self._config.support,
                 donate=self._config.donate,
                 submission=self._config.submission,
+                cover=self._config.cover,
+                description=self._config.description,
                 metadata=AttrDict(
                     version=1,
                     timestamp=datetime.now().timestamp()

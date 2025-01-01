@@ -1,3 +1,6 @@
+import os
+import magic
+
 from pathlib import Path
 
 from ..error import ConfigError
@@ -9,6 +12,7 @@ class Config(ConfigJson):
     def __init__(self, root_folder):
         self._log = Log("Config", enable_log=True)
         self._root_folder = root_folder
+        self._mime = magic.Magic(mime=True)
 
         json_file = self.json_folder.joinpath(ConfigJson.filename())
         if not json_file.exists():
@@ -43,6 +47,7 @@ class Config(ConfigJson):
         support = self.get("support", default.support)
         donate = self.get("donate", default.donate)
         submission = self.get("submission", default.submission)
+        description = self.get("description", default.description)
 
         log_dir = self.get("log_dir", default.log_dir)
         if log_dir != default.log_dir:
@@ -57,15 +62,39 @@ class Config(ConfigJson):
             support=support,
             donate=donate,
             submission=submission,
+            description=description,
+            cover=self.get_cover,
             base_url=base_url,
             max_num=max_num,
             enable_log=enable_log,
             log_dir=log_dir
         )
 
+
+    @property
+    def get_cover(self):
+        cover_file = self.assets_folder.joinpath("cover.webp")
+        cover = None
+
+        if cover_file.exists() and cover_file.suffix.lower() == '.webp':
+            cover_mime_type = self._mime.from_file(cover_file)
+
+            if cover_mime_type.lower() == 'image/webp':
+                cover = f"{self.base_url}assets/cover.webp"
+            else:
+                self._log.warning(f"get_cover: '{cover_file.name}' is not a valid WebP image.")
+        else:
+            self._log.info(f"get_cover: '{cover_file.name}' does not exist or is not a WebP file.")
+
+        return cover
+
     @property
     def json_folder(self):
         return self.get_json_folder(self._root_folder)
+
+    @property
+    def assets_folder(self):
+        return self.get_assets_folder(self._root_folder)
 
     @property
     def modules_folder(self):
@@ -78,6 +107,10 @@ class Config(ConfigJson):
     @classmethod
     def get_json_folder(cls, root_folder):
         return root_folder.joinpath("json")
+
+    @classmethod
+    def get_assets_folder(cls, root_folder):
+        return root_folder.joinpath("assets")
 
     @classmethod
     def get_modules_folder(cls, root_folder):

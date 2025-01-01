@@ -37,6 +37,8 @@ class ModulesJson(AttrDict, JsonIO):
     support: str
     donate: str
     submission: str
+    description: str
+    cover: str
     metadata: AttrDict
     modules: List[OnlineModule]
 
