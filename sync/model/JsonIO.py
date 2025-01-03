@@ -3,6 +3,8 @@ import yaml
 import os
 import re
 
+from sync.model import AttrDict
+
 class JsonIO:
     def write(self, file):
         assert isinstance(self, dict)
@@ -14,7 +16,7 @@ class JsonIO:
 
         if ext.lower() == '.yaml':
             with open(file, "w") as f:
-                yaml.dump(self, f, indent=2)
+                yaml.safe_dump(self, f, indent=2)
 
         else:
             with open(file, "w") as f:
@@ -36,7 +38,7 @@ class JsonIO:
         if ext.lower() == '.yaml':
             with open(file, encoding="utf-8", mode="r") as f:
                 text = cls.filter(f.read())
-                obj = yaml.load(text, Loader=yaml.FullLoader)
+                obj = yaml.safe_load(text)
 
                 assert isinstance(obj, dict)
         else: 
