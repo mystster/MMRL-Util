@@ -5,6 +5,11 @@ import re
 
 from sync.model import AttrDict
 
+def represent_attr_dict(dumper: yaml.Dumper, value: AttrDict):
+    return dumper.represent_mapping('tag:yaml.org,2002:map', value.items())
+
+yaml.add_representer(AttrDict, represent_attr_dict)
+
 class JsonIO:
     def write(self, file):
         assert isinstance(self, dict)
@@ -13,10 +18,10 @@ class JsonIO:
 
         file.parent.mkdir(parents=True, exist_ok=True)
 
-
         if ext.lower() == '.yaml':
             with open(file, "w") as f:
-                yaml.safe_dump(self, f, indent=2)
+                
+                yaml.dump(self, f, indent=2, default_flow_style=False)
 
         else:
             with open(file, "w") as f:
@@ -38,7 +43,9 @@ class JsonIO:
         if ext.lower() == '.yaml':
             with open(file, encoding="utf-8", mode="r") as f:
                 text = cls.filter(f.read())
-                obj = yaml.safe_load(text)
+                obj = yaml.load(text, Loader=yaml.FullLoader)
+                
+                
 
                 assert isinstance(obj, dict)
         else: 

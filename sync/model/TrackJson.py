@@ -7,6 +7,7 @@ from .ModuleNote import ModuleNote
 from .ModuleFeatures import ModuleFeatures
 from .ModuleManager import ModuleManager
 from .RootSolutions import RootSolutions
+from .TrackOptions import TrackOptions
 
 class TrackJson(AttrDict, JsonIO):
     id: str
@@ -45,6 +46,8 @@ class TrackJson(AttrDict, JsonIO):
     manager: ModuleManager
     
     antifeatures: list[str]
+    
+    options: TrackOptions
 
     # noinspection PyAttributeOutsideInit
     @property

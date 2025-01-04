@@ -21,7 +21,7 @@ setup(
         "gitpython>=3.1.37",
         "validators>=0.28.3",
         "pyyaml>=6.0.2",
-        "python-magic>=0.4.27",
+        "python-magic>=0.4.27"
     ],
     entry_points={
         "console_scripts": [

@@ -5,6 +5,11 @@ from typing import Dict, Type
 from .AttrDict import AttrDict
 from .JsonIO import JsonIO
 
+from .ModuleNote import ModuleNote
+from .ModuleFeatures import ModuleFeatures
+from .ModuleManager import ModuleManager
+from .RootSolutions import RootSolutions
+from .TrackOptions import TrackOptions
 
 class TrackJson(AttrDict, JsonIO):
     id: str
@@ -18,17 +23,31 @@ class TrackJson(AttrDict, JsonIO):
     support: str
     donate: str
     max_num: int
-    # author: str
-    # contributors: list[str]
-    cover: str
-    icon: str
-    screenshots: list[str]
-    require: list[str]
+ 
+    # FoxMMM supported props
+    maxApi: int
+    minApi: int
+    
+    # MMRL supported props
     category: str
     categories: list[str]
+    icon: str
+    homepage: str
+    donate: str
+    support: str
+    cover: str
+    screenshots: list[str]
+    license: str
+    screenshots: list[str]
     readme: str
     require: list[str]
-    antifeatures: list[str]
+    verified: bool
+    note: ModuleNote
+    features: ModuleFeatures
+    root: RootSolutions
+    manager: ModuleManager
+    
+    options: TrackOptions
 
     # without manually
     added: float 

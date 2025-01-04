@@ -1,9 +1,12 @@
 from pathlib import Path
 from typing import Dict, List
 
+from AttrDict import AttrDict
+from yaml import Dumper
 
 class JsonIO:
     def write(self: Dict, file: Path): ...
+    def represent_attr_dict(dumper: Dumper, value: AttrDict): ...
     @classmethod
     def filter(cls, text: str) -> str: ...
     @classmethod
