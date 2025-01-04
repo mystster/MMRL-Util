@@ -105,7 +105,7 @@ A string that contains details of the updates or changes made to the track.
 changelog: "Bug fixes and performance improvements."
 ```
 
-### `license` (required)
+### `license`
 
 The license under which the track is released (e.g., GPL, MIT, etc.).
 
@@ -161,7 +161,7 @@ The maximum supported API level for the track.
 maxApi: 30
 ```
 
-### `minApi` (required)
+### `minApi`
 
 The minimum required API level for the track to function.
 
@@ -169,7 +169,7 @@ The minimum required API level for the track to function.
 minApi: 21
 ```
 
-### `category` (required)
+### `category`
 
 The primary category the track belongs to.
 
