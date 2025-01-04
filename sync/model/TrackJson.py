@@ -39,6 +39,8 @@ class TrackJson(AttrDict, JsonIO):
     screenshots: list[str]
     readme: str
     require: list[str]
+    arch: list[str]
+    devices: list[str]
     verified: bool
     note: ModuleNote
     features: ModuleFeatures
