@@ -54,6 +54,7 @@ class Index:
     def _add_modules_json_1(self, track, update_json, online_module):
         if self.modules_json is None:
             self.modules_json = ModulesJson(
+                id=self._config.id,
                 name=self._config.name,
                 website=self._config.website,
                 support=self._config.support,

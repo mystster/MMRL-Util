@@ -32,6 +32,7 @@ class OnlineModule(AttrDict):
 
 
 class ModulesJson(AttrDict, JsonIO):
+    id: str
     name: str
     website: str
     support: str
