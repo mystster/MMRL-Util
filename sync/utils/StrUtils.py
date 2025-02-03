@@ -40,3 +40,18 @@ class StrUtils:
         filename = base.replace(" ", "_")
         filename = re.sub(r"[^a-zA-Z0-9\-._]", "", filename)
         return f"{filename}.{suffix}"
+
+    @classmethod
+    def extract_parts(text):
+        url = urlparse(text)
+        text = re.sub(r"[.:\/]", "", url.hostname + url.path)
+
+        length = len(text)
+        middle_start = (length - 3) // 2
+        middle_end = middle_start + 3
+
+        first_three = text[:3]
+        middle_three = text[middle_start:middle_end]
+        last_three = text[-3:]
+
+        return first_three + middle_three + last_three

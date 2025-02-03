@@ -43,8 +43,7 @@ class Config(ConfigJson):
         max_num = self.get("max_num", default.max_num)
         enable_log = self.get("enable_log", default.enable_log)
 
-
-        repoId = self.get("id", default.id)
+        repoId = self.get("id", StrUtils.extract_parts(base_url))
         website = self.get("website", default.website)
         support = self.get("support", default.support)
         donate = self.get("donate", default.donate)
