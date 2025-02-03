@@ -42,7 +42,7 @@ class StrUtils:
         return f"{filename}.{suffix}"
 
     @classmethod
-    def extract_parts(text):
+    def extract_parts(cls, text: str):
         url = urlparse(text)
         text = re.sub(r"[.:\/]", "", url.hostname + url.path)
 
