@@ -116,7 +116,7 @@ class LocalModule(AttrDict):
                 meta_file = cls.get_repo_json()
 
                 if meta_file is not None:
-                    cls._log.w(f"load: [{track.id}] -> found {meta_file}")
+                    cls._log.i(f"load: [{track.id}] -> found {meta_file}")
                     _, ext = os.path.splitext(meta_file)
                     
                     match ext.lower():
