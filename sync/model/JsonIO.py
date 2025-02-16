@@ -18,14 +18,15 @@ class JsonIO:
 
         file.parent.mkdir(parents=True, exist_ok=True)
 
-        if ext.lower() == '.yaml':
-            with open(file, "w") as f:
-                
-                yaml.dump(self, f, indent=2, default_flow_style=False)
-
-        else:
-            with open(file, "w") as f:
-                json.dump(self, f, indent=2)
+        match ext.lower():
+            case ".json":
+                with open(file, "w") as f:
+                    json.dump(self, f, indent=2)
+            case ".yaml" | ".yml":
+                with open(file, "w") as f: 
+                    yaml.dump(self, f, indent=2, default_flow_style=False)
+            case _:
+                raise ValueError(f"Invalid file extension: {file}")
 
     @classmethod
     def filter(cls, text):
@@ -40,19 +41,17 @@ class JsonIO:
         
         _, ext = os.path.splitext(file)
         
-        if ext.lower() == '.yaml':
-            with open(file, encoding="utf-8", mode="r") as f:
-                text = cls.filter(f.read())
-                obj = yaml.load(text, Loader=yaml.FullLoader)
-                
-                
-
-                assert isinstance(obj, dict)
-        else: 
-            with open(file, encoding="utf-8", mode="r") as f:
-                text = cls.filter(f.read())
-                obj = json.loads(text)
-
-                assert isinstance(obj, dict)
-
+        match ext.lower():
+            case ".json":
+                with open(file, encoding="utf-8", mode="r") as f:
+                    text = cls.filter(f.read())
+                    obj = json.loads(text)
+            case ".yaml" | ".yml":
+                with open(file, encoding="utf-8", mode="r") as f:
+                    text = cls.filter(f.read())
+                    obj = yaml.load(text, Loader=yaml.FullLoader)
+            case _:
+                raise ValueError(f"Invalid file extension: {file}")
+        
+        assert isinstance(obj, dict)
         return obj

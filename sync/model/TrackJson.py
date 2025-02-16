@@ -1,3 +1,5 @@
+import re, os
+
 from enum import Enum
 
 from .AttrDict import AttrDict
@@ -114,15 +116,13 @@ class TrackJson(AttrDict, JsonIO):
         return TrackJson(obj)
 
     @classmethod
-    def filename(cls, yaml):
-        if yaml:
-            return "track.yaml"
-        else:
-            return "track.json"
-
-    @classmethod
-    def filenameYaml(cls):
-        return "track.yaml"
+    def filename(cls, module_folder):
+        pattern = r"^track\.(json|y(a)?ml)$"
+        files = os.listdir(module_folder)
+        for file in files:
+            if re.match(pattern, file):
+                return file
+        raise FileNotFoundError("No matching file found in the folder. Supported file types are track.json, track.yml or track.yaml")
 
     @classmethod
     def expected_fields(cls, __type=True):

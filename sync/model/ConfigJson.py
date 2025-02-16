@@ -1,3 +1,5 @@
+import re, os
+
 from .AttrDict import AttrDict
 from .JsonIO import JsonIO
 
@@ -34,8 +36,14 @@ class ConfigJson(AttrDict, JsonIO):
         )
 
     @classmethod
-    def filename(cls):
+    def filename(cls, json_folder=None):
         return "config.json"
+        # pattern = r"^config\.(json|y(a)?ml)$"
+        # files = os.listdir(json_folder)
+        # for file in files:
+        #     if re.match(pattern, file):
+        #         return file
+        # raise FileNotFoundError("No matching file found in the folder. Supported file types are config.json, config.yml or config.yaml")
 
     @classmethod
     def expected_fields(cls, __type=True):

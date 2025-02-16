@@ -42,8 +42,7 @@ class Sync:
             return None
 
         update_json_file = module_folder.joinpath(UpdateJson.filename())
-        has_yaml_track = module_folder.joinpath("track.yaml").exists()
-        track_json_file = module_folder.joinpath(TrackJson.filename(has_yaml_track))
+        track_json_file = module_folder.joinpath(TrackJson.filename(module_folder))
         zipfile = module_folder.joinpath(online_module.zipfile_name)
             
             
@@ -51,7 +50,7 @@ class Sync:
         if force:
             for file in module_folder.glob("*"):
                 if file.name not in [
-                    TrackJson.filename(has_yaml_track),
+                    TrackJson.filename(module_folder),
                     online_module.zipfile_name,
                     online_module.changelog_filename
                 ]:

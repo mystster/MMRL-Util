@@ -24,7 +24,7 @@ class LocalTracks(BaseTracks):
     def get_track(self, module_id):
         module_folder = self._modules_folder.joinpath(module_id)
         has_yaml_track = module_folder.joinpath("track.yaml").exists()
-        json_file = module_folder.joinpath(TrackJson.filename(has_yaml_track))
+        json_file = module_folder.joinpath(TrackJson.filename(module_folder))
 
         result = self._get_from_file(json_file)
         if result.is_failure:
@@ -87,7 +87,7 @@ class LocalTracks(BaseTracks):
     def add_track(cls, track, modules_folder, cover=True):
         module_folder = modules_folder.joinpath(track.id)
         has_yaml_track = module_folder.joinpath("track.yaml").exists()
-        json_file = module_folder.joinpath(TrackJson.filename(has_yaml_track))
+        json_file = module_folder.joinpath(TrackJson.filename(module_folder))
 
         if not json_file.exists():
             track.added = datetime.now().timestamp()
@@ -111,8 +111,7 @@ class LocalTracks(BaseTracks):
     @classmethod
     def update_track(cls, track, modules_folder):
         module_folder = modules_folder.joinpath(track.id)
-        has_yaml_track = module_folder.joinpath("track.yaml").exists()
-        json_file = module_folder.joinpath(TrackJson.filename(has_yaml_track))
+        json_file = module_folder.joinpath(TrackJson.filename(module_folder))
 
         if not json_file.exists():
             return
