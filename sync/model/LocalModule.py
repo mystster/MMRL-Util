@@ -1,6 +1,7 @@
-import json
-import yaml
+import json, yaml, re, os
 from pathlib import Path
+
+from sync.utils import Log
 
 from .AttrDict import AttrDict
 from .ArchiveIO import ArchiveIO
@@ -67,6 +68,8 @@ class LocalModule(AttrDict):
         zip_compression = track.deep_get("options.archive.compression", default="stored")
         disable_metadata = track.deep_get("options.disableRemoteMetadata", default=False)
         
+        cls._log = Log("LocalModule", enable_log=config.enable_log, log_dir=config.log_dir)
+        
         cls._zipfile = ArchiveIO(file=file, mode="r", compression=zip_compression)
         fields = cls.expected_fields()
 
@@ -109,24 +112,33 @@ class LocalModule(AttrDict):
                     local_module[key] = value
 
         try:
-            if not disable_metadata:
-                has_yaml = cls._zipfile.file_exists("common/repo.yaml")
-                if has_yaml:
-                    raw_json = yaml.load(cls._zipfile.file_read("common/repo.yaml"), Loader=yaml.FullLoader)
-                else:
-                    raw_json = json.loads(cls._zipfile.file_read("common/repo.json"))
-                raw_json = cls.clean_json(raw_json)
+            if not disable_metadata:                
+                meta_file = cls.get_repo_json()
 
-                for item in raw_json.items():
-                    key, value = item
+                if meta_file is not None:
+                    cls._log.w(f"load: [{track.id}] -> found {meta_file}")
+                    _, ext = os.path.splitext(meta_file)
+                    
+                    match ext.lower():
+                        case ".json":
+                            raw_json = json.loads(cls._zipfile.file_read(meta_file))
+                        case ".yaml" | ".yml":
+                            raw_json = yaml.load(cls._zipfile.file_read(meta_file), Loader=yaml.FullLoader)  
+                        
+                    raw_json = cls.clean_json(raw_json)
 
-                    _type = fields[key]
-                    obj[key] = _type(value)
+                    for item in raw_json.items():
+                        key, value = item
 
-                for key in fields.keys():
-                    value = obj.get(key)
-                    if value is not None and value is not False: 
-                        local_module[key] = value
+                        _type = fields[key]
+                        obj[key] = _type(value)
+
+                    for key in fields.keys():
+                        value = obj.get(key)
+                        if value is not None and value is not False: 
+                            local_module[key] = value
+            else:
+                cls._log.w(f"load: [{track.id}] -> remote metadata disabled")
                     
         except BaseException:
             pass
@@ -160,6 +172,14 @@ class LocalModule(AttrDict):
         local_module.features = {k: v for k, v in features.items() if v is not None and v is not False}
 
         return cls.clean_json(local_module)
+   
+    @classmethod
+    def get_repo_json(cls):
+        pattern = r"^common\/repo\.(json|y(a)?ml)$"
+        files = cls._zipfile.namelist()
+        for file in files:
+            if re.match(pattern, file):
+                return file
    
     @classmethod
     def expected_fields(cls, __type=True):
