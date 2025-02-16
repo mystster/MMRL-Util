@@ -69,7 +69,8 @@ class Index:
                 modules=list()
             )
 
-        online_module.track = track.json()
+        module_folder = self._modules_folder.joinpath(track.id)
+        online_module.track = track.json(self._config, module_folder)
         online_module.versions = update_json.versions
 
         self.modules_json.modules.append(online_module)

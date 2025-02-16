@@ -2,6 +2,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Dict, Type
 
+from sync.core import Config
+
 from .AttrDict import AttrDict
 from .JsonIO import JsonIO
 
@@ -58,7 +60,7 @@ class TrackJson(AttrDict, JsonIO):
 
     @property
     def type(self) -> TrackType: ...
-    def json(self) -> AttrDict: ...
+    def json(self, config: Config, module_folder: Path) -> AttrDict: ...
     def write(self, file: Path): ...
     @classmethod
     def load(cls, file: Path) -> TrackJson: ...
@@ -75,3 +77,5 @@ class TrackType(Enum):
     GIT: TrackType
     LOCAL_JSON: TrackType
     LOCAL_ZIP: TrackType
+    LOCAL_YAML: TrackType
+    ONLINE_YAML: TrackType

@@ -86,7 +86,6 @@ class LocalTracks(BaseTracks):
     @classmethod
     def add_track(cls, track, modules_folder, cover=True):
         module_folder = modules_folder.joinpath(track.id)
-        has_yaml_track = module_folder.joinpath("track.yaml").exists()
         json_file = module_folder.joinpath(TrackJson.filename(module_folder))
 
         if not json_file.exists():

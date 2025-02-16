@@ -52,6 +52,7 @@ class TrackJson(AttrDict, JsonIO):
     antifeatures: list[str]
     
     options: TrackOptions
+    build_metadata: str
 
     # noinspection PyAttributeOutsideInit
     @property
@@ -82,12 +83,13 @@ class TrackJson(AttrDict, JsonIO):
 
         return self._type
 
-    def json(self):
+    def json(self, config, module_folder):
         return AttrDict(
             type=self.type.name,
             added=self.added,
             source=self.source or None,
-            antifeatures=self.antifeatures or None
+            antifeatures=self.antifeatures or None,
+            build_metadata=f"{config.base_url}modules/{self.id}/{self.filename(module_folder)}",
         )
 
     def write(self, file):
@@ -139,3 +141,5 @@ class TrackType(Enum):
     GIT = 3
     LOCAL_JSON = 4
     LOCAL_ZIP = 5
+    LOCAL_YAML = 6
+    ONLINE_YAML = 7
