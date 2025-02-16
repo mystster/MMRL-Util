@@ -87,6 +87,13 @@ class Log:
                 log_file.unlink()
 
     @classmethod
+    def get_msg(cls, err: BaseException) -> str:
+        msg = "{} " * len(err.args)
+        msg = msg.format(*err.args).rstrip()
+        return f"{err.__class__.__name__}({msg})"
+
+    @classmethod
+    @functools.lru_cache()
     def get_logger(cls, name: str = "root", log_file: Optional[Path] = None, log_level: int = logging.DEBUG):
         logger = logging.getLogger(name)
         if name in cls._logger_initialized:
