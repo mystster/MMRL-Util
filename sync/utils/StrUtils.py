@@ -44,7 +44,7 @@ class StrUtils:
     @classmethod
     def extract_parts(cls, text: str):
         url = urlparse(text)
-        text = re.sub(r"[.:\/]", "", url.hostname + url.path)
+        text = re.sub(r"[.:\/\-]", "", url.hostname + url.path)
 
         length = len(text)
         middle_start = (length - 3) // 2
