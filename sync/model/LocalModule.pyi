@@ -6,6 +6,8 @@ from .TrackJson import TrackJson
 
 from ..core.Config import Config
 
+from .ModuleManager import ModuleManager
+from .RootSolutions import RootSolutions
 from .ModuleNote import ModuleNote
 from .ModuleFeatures import ModuleFeatures
 
@@ -41,6 +43,10 @@ class LocalModule(AttrDict):
     verified: bool
     note: ModuleNote
     features: ModuleFeatures
+    root: RootSolutions
+    manager: ModuleManager
+    permissions: list[str]
+
 
     @classmethod
     def load(cls, file: Path, track: TrackJson, config: Config) -> LocalModule: ...

@@ -15,7 +15,7 @@ class ModuleFeatures(AttrDict):
     boot_completed: bool
     
     # MMRL
-    modconf: bool
+    webui_plugins: bool
     
     @classmethod
     def expected_fields(cls, __type=True):

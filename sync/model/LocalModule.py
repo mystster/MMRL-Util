@@ -48,6 +48,7 @@ class LocalModule(AttrDict):
     features: ModuleFeatures
     root: RootSolutions
     manager: ModuleManager
+    permissions: list[str]
 
     @classmethod
     def clean_json(cls, data):
@@ -146,7 +147,50 @@ class LocalModule(AttrDict):
         local_module.verified = track.verified or False
         local_module.added = track.added or 0
         local_module.timestamp = track.last_update
-        local_module.size = Path(file).stat().st_size        
+        local_module.size = Path(file).stat().st_size
+        local_module.permissions = []     
+        
+        webui_config_file = cls.get_webui_config()
+        if webui_config_file is not None:
+            cls._log.i(f"load: [{track.id}] -> found {webui_config_file}")
+            config_raw_json = json.loads(cls._zipfile.file_read(webui_config_file))
+            local_module.permissions = config_raw_json.get("permissions", [])
+        
+        if cls._zipfile.file_exists(f"service.sh") or cls._zipfile.file_exists(f"common/service.sh"):
+            local_module.permissions.append("magisk.permission.SERVICE")
+
+        if cls._zipfile.file_exists(f"post-fs-data.sh") or cls._zipfile.file_exists(f"common/post-fs-data.sh"):
+            local_module.permissions.append("magisk.permission.POST_FS_DATA")
+            
+        if cls._zipfile.file_exists(f"system.prop") or cls._zipfile.file_exists(f"common/system.prop"):
+            local_module.permissions.append("magisk.permission.RESETPROP")
+            
+        if cls._zipfile.file_exists(f"sepolicy.rule"):
+            local_module.permissions.append("magisk.permission.SEPOLICY")
+            
+        if cls._zipfile.file_exists(f"zygisk/"):
+            local_module.permissions.append("magisk.permission.ZYGISK")
+            
+        if cls._zipfile.file_exists(f"action.sh") or cls._zipfile.file_exists(f"common/action.sh"):
+            local_module.permissions.append("magisk.permission.ACTION")
+            
+        if cls._zipfile.file_exists(f"webroot/index.html"):
+            local_module.permissions.append("kernelsu.permission.WEBUI")
+        
+        if cls._zipfile.file_exists(f"webroot/index.mmrl.html"):
+            local_module.permissions.append("mmrl.permission.WEBUI")
+            
+        if cls._zipfile.file_exists(f"webroot/config.mmrl.json"):
+            local_module.permissions.append("mmrl.permission.WEBUI_CONFIG")
+        
+        if cls._zipfile.file_exists(f"post-mount.sh") or cls._zipfile.file_exists(f"common/post-mount.sh"):
+            local_module.permissions.append("kernelsu.permission.POST_MOUNT")
+            
+        if cls._zipfile.file_exists(f"boot-completed.sh") or cls._zipfile.file_exists(f"common/boot-completed.sh"):
+            local_module.permissions.append("kernelsu.permission.BOOT_COMPLETED")
+        
+        if len([name for name in cls._zipfile.namelist() if name.endswith('.apk')]) != 0:
+            local_module.permissions.append("mmrl.permission.APKS")
         
         features = {
             "service": cls._zipfile.file_exists(f"service.sh") or cls._zipfile.file_exists(f"common/service.sh"),
@@ -176,6 +220,14 @@ class LocalModule(AttrDict):
     @classmethod
     def get_repo_json(cls):
         pattern = r"^common\/repo\.(json|y(a)?ml)$"
+        files = cls._zipfile.namelist()
+        for file in files:
+            if re.match(pattern, file):
+                return file
+    
+    @classmethod
+    def get_webui_config(cls):
+        pattern = r"^webroot\/config\.mmrl\.(json|y(a)?ml)$"
         files = cls._zipfile.namelist()
         for file in files:
             if re.match(pattern, file):
