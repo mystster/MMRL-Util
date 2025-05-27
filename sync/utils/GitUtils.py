@@ -1,6 +1,7 @@
 import functools
 import os
 import shutil
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -23,7 +24,7 @@ class GitUtils:
     def _get_repo_name_from_url(cls, url: str) -> Optional[tuple[str, str]]:
         """Extracts owner and repo name from GitHub URL."""
         # Handles https://github.com/owner/repo.git and git@github.com:owner/repo.git
-        match = shutil.re.match(r"(?:https?://github\.com/|git@github\.com:)([^/]+)/([^/.]+)(?:\.git)?", url)
+        match = re.match(r"(?:https?://github\.com/|git@github\.com:)([^/]+)/([^/.]+)(?:\.git)?", url)
         if match:
             return match.group(1), match.group(2)
         return None
