@@ -82,7 +82,7 @@ class GitUtils:
                 logger.e(f"[{module_id}] Error fetching GitHub release for {url}: {e}. Will attempt to clone.")
                 # Fall through to clone if release download fails
         elif repo_parts and not api_token:
-            logger.w(f"[{module_id}] GitHub URL detected but GITHUB_API_TOKEN env var not set. Skipping release check, will attempt to clone.")
+            logger.w(f"[{module_id}] GitHub URL detected but GITHUB_TOKEN env var not set. Skipping release check, will attempt to clone.")
 
         # Fallback to cloning and zipping
         logger.i(f"[{module_id}] Cloning repository: {url}")
