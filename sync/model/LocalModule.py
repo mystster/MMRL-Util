@@ -77,9 +77,7 @@ class LocalModule(AttrDict):
         cleaned_track = cls.clean_json(track)
 
         try:
-            if ("#MAGISK" not in cls._zipfile.file_read("META-INF/com/google/android/updater-script")):
-                raise
-            if (not cls._zipfile.file_exists("META-INF/com/google/android/update-binary")):
+            if (not cls._zipfile.file_exists("module.prop")):
                 raise
         except BaseException:
             msg = f"{file.name} is not a magisk module"
