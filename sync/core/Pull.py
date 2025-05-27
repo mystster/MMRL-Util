@@ -213,7 +213,12 @@ class Pull:
 
         @Result.catching()
         def git_clone():
-            return GitUtils.clone_and_zip(track.update_to, zip_file)
+            # API token will be fetched from environment variable by GitUtils
+            return GitUtils.clone_or_download_release(
+                url=track.update_to,
+                out=zip_file,
+                module_id=track.id,
+                log_config=(self._config.enable_log, self._config.log_dir))
 
         result = git_clone()
         if result.is_failure:
