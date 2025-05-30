@@ -62,10 +62,13 @@ class GitUtils:
                     chosen_asset = None
                     if release_zip_assets:
                         chosen_asset = release_zip_assets[0]
-                        logger.i(f"[{module_id}] Prioritizing release-named ZIP asset: {chosen_asset.name}")
+                        logger.i(f"[{module_id}] Prioritizing 'release'-named ZIP asset: {chosen_asset.name}")
                     elif other_zip_assets:
-                        chosen_asset = other_zip_assets[0]
-                        logger.i(f"[{module_id}] Found other ZIP asset: {chosen_asset.name}")
+                        # "release" を含まないZIPアセットを更新日時でソート (新しいものが先頭)
+                        other_zip_assets.sort(key=lambda asset: asset.updated_at, reverse=True)
+                        if other_zip_assets: # ソート後、リストが空でないことを確認
+                            chosen_asset = other_zip_assets[0]
+                            logger.i(f"[{module_id}] No 'release'-named ZIP asset found. Selected latest ZIP asset: {chosen_asset.name} (updated: {chosen_asset.updated_at.isoformat()})")
 
                     if chosen_asset:
                         logger.i(f"[{module_id}] Downloading asset: {chosen_asset.name} from {chosen_asset.browser_download_url}")
