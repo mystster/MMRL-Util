@@ -211,6 +211,9 @@ class Pull:
     def from_git(self, track):
         zip_file = self._modules_folder.joinpath(track.id, f"{track.id}.zip")
 
+        # track オブジェクトから download_source を取得。なければ 'auto' をデフォルトとする。
+        download_preference = getattr(track, 'download_source', 'auto').lower()
+
         @Result.catching()
         def git_clone():
             # API token will be fetched from environment variable by GitUtils
@@ -218,7 +221,8 @@ class Pull:
                 url=track.update_to,
                 out=zip_file,
                 module_id=track.id,
-                log_config=(self._config.enable_log, self._config.log_dir))
+                log_config=(self._config.enable_log, self._config.log_dir),
+                download_preference=download_preference)
 
         result = git_clone()
         if result.is_failure:
