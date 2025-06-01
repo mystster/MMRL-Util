@@ -24,7 +24,7 @@ class TrackJson(AttrDict, JsonIO):
     donate: str
     max_num: int
     download_source: str
- 
+
     # FoxMMM supported props
     maxApi: int
     minApi: int

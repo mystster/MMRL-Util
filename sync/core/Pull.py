@@ -209,10 +209,24 @@ class Pull:
         return online_module, last_modified
 
     def from_git(self, track):
+        # --- track オブジェクトの内容をログに出力 ---
+        if track is None:
+            self._log.d("from_git: track object is None.")
+        else:
+            self._log.d(f"from_git: Received track object. ID: {track.get('id', 'N/A')}")
+            self._log.d(f"from_git: track object (type): {type(track).__name__}")
+            self._log.d("from_git: Dumping content of track object:")
+            # AttrDict は辞書のように振る舞うため、items() でキーと値を取得できます
+            for key, value in track.items():
+                self._log.d(f"  - {key}: {value} (type: {type(value).__name__})")
+            self._log.d("from_git: End of track object dump.")
+        # --- ログ出力終了 ---
+
         zip_file = self._modules_folder.joinpath(track.id, f"{track.id}.zip")
 
         # track オブジェクトから download_source を取得。なければ 'auto' をデフォルトとする。
-        download_preference = getattr(track, 'download_source', 'auto').lower()
+        # download_preference = getattr(track, 'download_source', 'auto').lower()
+        download_preference = track.get('download_source', 'auto').lower()
 
         @Result.catching()
         def git_clone():
