@@ -105,7 +105,7 @@ class GitUtils:
                                     release_zip_artifacts.append(artifact_item)
                                 else:
                                     other_zip_artifacts.append(artifact_item)
-                        chosen_artifact: Optional[Artifact] = None
+                        chosen_artifact: Optional[Artifact.Artifact] = None
                         if release_zip_artifacts:
                             release_zip_artifacts.sort(key=lambda art: art.updated_at, reverse=True)
                             chosen_artifact = release_zip_artifacts[0]
