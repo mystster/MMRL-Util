@@ -100,7 +100,7 @@ class GitUtils:
                         release_zip_artifacts = []
                         other_zip_artifacts = []
                         for artifact_item in artifacts_list: # artifact_item is Artifact
-                            if artifact_item.name.endswith(".zip") and not artifact_item.expired:
+                            if not artifact_item.expired:
                                 if "release" in artifact_item.name.lower():
                                     release_zip_artifacts.append(artifact_item)
                                 else:
