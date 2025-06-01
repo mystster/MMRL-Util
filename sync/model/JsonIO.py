@@ -8,7 +8,7 @@ from sync.model import AttrDict
 def represent_attr_dict(dumper: yaml.Dumper, value: AttrDict):
     return dumper.represent_mapping('tag:yaml.org,2002:map', value.items())
 
-yaml.add_representer(AttrDict, represent_attr_dict)
+yaml.add_representer(AttrDict, represent_attr_dict, Dumper=yaml.Dumper)
 
 class JsonIO:
     def write(self, file):
@@ -24,7 +24,7 @@ class JsonIO:
                     json.dump(self, f, indent=2)
             case ".yaml" | ".yml":
                 with open(file, "w") as f: 
-                    yaml.dump(self, f, indent=2, default_flow_style=False)
+                    yaml.dump(self, f, indent=2, default_flow_style=False, Dumper=yaml.Dumper)
             case _:
                 raise ValueError(f"Invalid file extension: {file}")
 
