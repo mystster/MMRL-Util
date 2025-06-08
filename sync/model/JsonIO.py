@@ -3,7 +3,7 @@ import yaml
 import os
 import re
 
-from sync.model import AttrDict
+from sync.model.AttrDict import AttrDict
 
 def represent_attr_dict(dumper: yaml.Dumper, value: AttrDict):
     return dumper.represent_mapping('tag:yaml.org,2002:map', value.items())
