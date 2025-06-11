@@ -24,7 +24,7 @@ class GitUtils:
     def _get_repo_name_from_url(cls, url: str) -> Optional[tuple[str, str]]:
         """Extracts owner and repo name from GitHub URL."""
         # Handles https://github.com/owner/repo.git and git@github.com:owner/repo.git
-        match = re.match(r"(?:https?://github\.com/|git@github\.com:)([^/]+)/([^/.]+)(?:\.git)?", url)
+        match = re.match(r"(?:https?://github\.com/|git@github\.com:)([^/]+)/([^/.]+)(?:\.git)?", url, re.IGNORECASE)
         if match:
             return match.group(1), match.group(2)
         return None
