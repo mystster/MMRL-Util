@@ -120,7 +120,7 @@ class GitUtils:
                             dl_ts = HttpUtils.download(
                                 chosen_artifact.archive_download_url,
                                 out,
-                                headers={"Authorization": f"bearer {api_token}"}
+                                headers={"Authorization": f"Bearer {api_token}"}
                             )
                             logger.i(f"[{module_id}] Successfully downloaded artifact {chosen_artifact.name} to {out}")
                             return chosen_artifact.updated_at.timestamp() if chosen_artifact.updated_at else dl_ts
