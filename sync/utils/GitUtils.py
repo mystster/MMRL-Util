@@ -63,8 +63,9 @@ class GitUtils:
                                 other_zip_assets.append(asset_item)
                     chosen_asset = None
                     if release_zip_assets: # 'release' を含むものを優先
-                        chosen_asset = release_zip_assets[0] # TODO: 複数ある場合は更新日時でソートも検討
-                        logger.i(f"[{module_id}] Prioritizing 'release'-named ZIP asset: {chosen_asset.name}")
+                        release_zip_assets.sort(key=lambda asset: asset.updated_at, reverse=True) # Sort by updated_at in descending order
+                        chosen_asset = release_zip_assets[0]
+                        logger.i(f"[{module_id}] Prioritizing most recently updated 'release'-named ZIP asset: {chosen_asset.name} (updated: {chosen_asset.updated_at.isoformat()})")
                     elif other_zip_assets:
                         other_zip_assets.sort(key=lambda asset: asset.updated_at, reverse=True)
                         chosen_asset = other_zip_assets[0]
