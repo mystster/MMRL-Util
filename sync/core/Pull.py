@@ -210,9 +210,9 @@ class Pull:
 
     def from_git(self, track):
         zip_file = self._modules_folder.joinpath(track.id, f"{track.id}.zip")
-
-        # track オブジェクトから download_source を取得。なければ 'auto' をデフォルトとする。
-        download_preference = track.get('download_source', 'auto').lower()
+        
+        # Get options.github.source from the track object, defaulting to 'auto' if not present.
+        download_preference = track.deep_get('options.github.source', 'auto').lower()
 
         @Result.catching()
         def git_clone():
