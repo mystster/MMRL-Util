@@ -10,6 +10,19 @@ def represent_attr_dict(dumper: yaml.Dumper, value: AttrDict):
 
 yaml.add_representer(AttrDict, represent_attr_dict, Dumper=yaml.Dumper)
 
+def construct_attr_dict(loader, node):
+    # dictitemsノードを取得し、AttrDictに変換
+    values = loader.construct_mapping(node, deep=True)
+    if "dictitems" in values:
+        return AttrDict(values["dictitems"])
+    return AttrDict(values)
+
+yaml.add_constructor(
+    "!!python/object/new:mmrl-util.sync.model.AttrDict.AttrDict",
+    construct_attr_dict,
+    Loader=yaml.FullLoader
+)
+
 class JsonIO:
     def write(self, file):
         assert isinstance(self, dict)
