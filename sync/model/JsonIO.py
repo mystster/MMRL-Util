@@ -8,7 +8,7 @@ from sync.model.AttrDict import AttrDict
 def represent_attr_dict(dumper: yaml.Dumper, value: AttrDict):
     return dumper.represent_mapping('tag:yaml.org,2002:map', value.items())
 
-yaml.add_representer(AttrDict, represent_attr_dict, Dumper=yaml.Dumper)
+yaml.add_representer(AttrDict, represent_attr_dict, Dumper=yaml.SafeDumper)
 
 class JsonIO:
     def write(self, file):
