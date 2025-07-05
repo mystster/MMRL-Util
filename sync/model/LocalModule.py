@@ -1,5 +1,11 @@
-import json, yaml, re, os
+import json, re, os
 from pathlib import Path
+
+try:
+    import yaml
+    YAML_AVAILABLE = True
+except ImportError:
+    YAML_AVAILABLE = False
 
 from sync.utils import Log
 
@@ -114,31 +120,65 @@ class LocalModule(AttrDict):
 
                 if meta_file is not None:
                     cls._log.i(f"load: [{track.id}] -> found {meta_file}")
-                    _, ext = os.path.splitext(meta_file)
-                    
-                    match ext.lower():
-                        case ".json":
-                            raw_json = json.loads(cls._zipfile.file_read(meta_file))
-                        case ".yaml" | ".yml":
-                            raw_json = yaml.load(cls._zipfile.file_read(meta_file), Loader=yaml.FullLoader)  
+                    try:
+                        _, ext = os.path.splitext(meta_file)
                         
-                    raw_json = cls.clean_json(raw_json)
+                        match ext.lower():
+                            case ".json":
+                                raw_content = cls._zipfile.file_read(meta_file)
+                                cls._log.d(f"load: [{track.id}] -> JSON content length: {len(raw_content)}")
+                                raw_json = json.loads(raw_content)
+                            case ".yaml" | ".yml":
+                                if not YAML_AVAILABLE:
+                                    cls._log.e(f"load: [{track.id}] -> YAML support not available, install PyYAML")
+                                    raw_json = None
+                                else:
+                                    raw_content = cls._zipfile.file_read(meta_file)
+                                    cls._log.d(f"load: [{track.id}] -> YAML content length: {len(raw_content)}")
+                                    raw_json = yaml.load(raw_content, Loader=yaml.FullLoader)
+                            case _:
+                                cls._log.w(f"load: [{track.id}] -> unsupported metadata file extension: {ext}")
+                                raw_json = None
+                        
+                        if raw_json is not None:
+                            cls._log.d(f"load: [{track.id}] -> parsed metadata keys: {list(raw_json.keys())}")
+                            raw_json = cls.clean_json(raw_json)
+                            cls._log.d(f"load: [{track.id}] -> cleaned metadata keys: {list(raw_json.keys())}")
+                        
+                    except json.JSONDecodeError as e:
+                        cls._log.e(f"load: [{track.id}] -> failed to parse JSON from {meta_file}: {e}")
+                        raw_json = None
+                    except Exception as e:
+                        # This will catch yaml.YAMLError if yaml is available, or any other parsing error
+                        if YAML_AVAILABLE and 'yaml' in str(type(e)).lower():
+                            cls._log.e(f"load: [{track.id}] -> failed to parse YAML from {meta_file}: {e}")
+                        else:
+                            cls._log.e(f"load: [{track.id}] -> error reading {meta_file}: {e}")
+                        raw_json = None
+                else:
+                    cls._log.d(f"load: [{track.id}] -> no repo metadata file found")
+                    raw_json = None
 
+                if raw_json is not None:
                     for item in raw_json.items():
                         key, value = item
-
-                        _type = fields[key]
-                        obj[key] = _type(value)
-
-                    for key in fields.keys():
-                        value = obj.get(key)
-                        if value is not None and value is not False: 
-                            local_module[key] = value
+                        
+                        # Only process keys that are valid fields in the class
+                        if key in fields:
+                            try:
+                                _type = fields[key]
+                                typed_value = _type(value)
+                                if typed_value is not None and typed_value is not False:
+                                    local_module[key] = typed_value
+                            except (ValueError, TypeError) as e:
+                                cls._log.w(f"load: [{track.id}] -> failed to convert {key}={value} to {_type}: {e}")
+                                continue
             else:
                 cls._log.w(f"load: [{track.id}] -> remote metadata disabled")
                     
-        except BaseException:
-            pass
+        except Exception as e:
+            cls._log.e(f"load: [{track.id}] -> error processing repo metadata: {e}")
+            # Continue with processing even if metadata fails
 
         local_module.verified = track.verified or False
         local_module.added = track.added or 0
@@ -217,17 +257,34 @@ class LocalModule(AttrDict):
     def get_repo_json(cls):
         pattern = r"^common\/repo\.(json|y(a)?ml)$"
         files = cls._zipfile.namelist()
+        
+        # Debug: log all files that start with 'common'
+        common_files = [f for f in files if f.lower().startswith('common')]
+        if common_files:
+            cls._log.d(f"get_repo_json: found common files: {common_files}")
+        
         for file in files:
-            if re.match(pattern, file):
+            # Normalize path separators for comparison
+            normalized_file = file.replace('\\', '/')
+            if re.match(r"^common\/repo\.(json|y(a)?ml)$", normalized_file):
+                cls._log.d(f"get_repo_json: matched repo file: {file}")
                 return file
+                
+        cls._log.d(f"get_repo_json: no repo file found matching pattern {pattern}")
+        return None
     
     @classmethod
     def get_webui_config(cls):
-        pattern = r"^webroot\/config\.mmrl\.(json|y(a)?ml)$"
         files = cls._zipfile.namelist()
+        
         for file in files:
-            if re.match(pattern, file):
+            # Normalize path separators for comparison
+            normalized_file = file.replace('\\', '/')
+            if re.match(r"^webroot\/config\.mmrl\.(json|y(a)?ml)$", normalized_file):
+                cls._log.d(f"get_webui_config: matched config file: {file}")
                 return file
+                
+        return None
    
     @classmethod
     def expected_fields(cls, __type=True):
