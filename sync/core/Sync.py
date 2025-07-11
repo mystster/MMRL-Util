@@ -154,9 +154,8 @@ class Sync:
                     online_module = future.result()
                     if online_module is not None:
                         self._log.i(f"update: [{online_module.id}] -> update to {online_module.version_display}")
-                except Exception as exc:
-                    self._log.e(f"An error occurred while processing module '{track.id}'")
-                    raise exc
+                except Exception:
+                    self._log.e(f"An error occurred while processing module '{track.id}'. Skipping.", exc_info=True)
 
     def get_versions_diff(self):
         headers = ["id", "name", "version"]

@@ -23,8 +23,12 @@ class LocalTracks(BaseTracks):
 
     def get_track(self, module_id):
         module_folder = self._modules_folder.joinpath(module_id)
-        has_yaml_track = module_folder.joinpath("track.yaml").exists()
-        json_file = module_folder.joinpath(TrackJson.filename(module_folder))
+        try:
+            json_file = module_folder.joinpath(TrackJson.filename(module_folder))
+        except FileNotFoundError as e:
+            # Log the error and skip this module by returning None
+            self._log.e(f"get_track: [{module_id}] -> {e}")
+            return None
 
         result = self._get_from_file(json_file)
         if result.is_failure:
