@@ -143,16 +143,20 @@ class Sync:
             tracks = self._tracks.get_tracks(module_ids)
 
         with ThreadPoolExecutor(max_workers=1 if single else None) as executor:
-            futures = []
-            for track in tracks:
-                futures.append(
-                    executor.submit(self._update_jsons, track=track, force=force)
-                )
+            future_to_track = {
+                executor.submit(self._update_jsons, track=track, force=force): track
+                for track in tracks
+            }
 
-            for future in concurrent.futures.as_completed(futures):
-                online_module = future.result()
-                if online_module is not None:
-                    self._log.i(f"update: [{online_module.id}] -> update to {online_module.version_display}")
+            for future in concurrent.futures.as_completed(future_to_track):
+                track = future_to_track[future]
+                try:
+                    online_module = future.result()
+                    if online_module is not None:
+                        self._log.i(f"update: [{online_module.id}] -> update to {online_module.version_display}")
+                except Exception as exc:
+                    self._log.e(f"An error occurred while processing module '{track.id}'")
+                    raise exc
 
     def get_versions_diff(self):
         headers = ["id", "name", "version"]
