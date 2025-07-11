@@ -124,7 +124,7 @@ class TrackJson(AttrDict, JsonIO):
         for file in files:
             if re.match(pattern, file):
                 return file
-        raise FileNotFoundError("No matching file found in the folder. Supported file types are track.json, track.yml or track.yaml")
+        raise FileNotFoundError(f"No matching file found in '{module_folder}'. Supported file types are track.json, track.yml or track.yaml")
 
     @classmethod
     def expected_fields(cls, __type=True):
