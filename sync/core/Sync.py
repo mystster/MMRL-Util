@@ -12,6 +12,8 @@ from ..model import (
 from ..track import BaseTracks, LocalTracks, GithubTracks
 from ..utils import Log
 
+import traceback
+
 
 class Sync:
     def __init__(self, root_folder, config, tracks=None):
@@ -155,7 +157,8 @@ class Sync:
                     if online_module is not None:
                         self._log.i(f"update: [{online_module.id}] -> update to {online_module.version_display}")
                 except Exception:
-                    self._log.e(f"An error occurred while processing module '{track.id}'. Skipping.", exc_info=True)
+                    self._log.e(f"An error occurred while processing module '{track.id}'. Skipping.\n{traceback.format_exc()}")
+                    
 
     def get_versions_diff(self):
         headers = ["id", "name", "version"]
